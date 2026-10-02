@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數學閃電王｜加減乘除 PK</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Microsoft JhengHei",sans-serif;background:linear-gradient(135deg,#17133d,#321b62 48%,#111827);color:#fff;min-height:100vh}
+button,input{font:inherit}
+.wrap{max-width:1000px;margin:auto;padding:18px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:28px;font-weight:900}.sub{opacity:.7;font-size:13px}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.pill{background:#ffffff16;border:1px solid #ffffff22;padding:8px 12px;border-radius:999px}
+.card{background:#ffffff0d;border:1px solid #ffffff1c;border-radius:24px;padding:24px;box-shadow:0 20px 60px #0005;backdrop-filter:blur(10px)}
+.hero{text-align:center;margin-top:20px}.hero h1{font-size:clamp(34px,7vw,64px);margin:12px 0 4px}.hero p{opacity:.78}
+.btn{border:0;border-radius:16px;padding:13px 20px;font-weight:900;cursor:pointer;transition:.15s;box-shadow:0 8px 20px #0003}
+.btn:hover{transform:translateY(-2px)}.primary{background:linear-gradient(135deg,#ffd54a,#ff8a00);color:#291300}.secondary{background:#ffffff18;color:#fff;border:1px solid #ffffff25}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.card{padding:18px}}
+.hidden{display:none!important}
+.mode{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.mode button{min-width:150px}
+.question{text-align:center;padding:10px}.round{font-weight:800;color:#ffd95c}.timer{font-size:22px;font-weight:900;margin:10px}.bar{height:10px;background:#ffffff18;border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#4ade80,#facc15,#fb7185);width:100%;transition:width .2s}
+.qtext{font-size:clamp(42px,10vw,76px);font-weight:1000;margin:25px 0;letter-spacing:2px}
+.answer{display:flex;gap:10px;max-width:600px;margin:auto}.answer input{flex:1;min-width:0;padding:16px;border-radius:15px;border:2px solid #ffffff24;background:#0b1025;color:white;text-align:center;font-size:28px;font-weight:900;outline:none}.answer input:focus{border-color:#ffd54a}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:440px;margin:22px auto 0}
+.choice-btn{padding:20px 10px;border-radius:16px;border:2px solid #ffffff24;background:#0b1025;color:#fff;font-size:26px;font-weight:900;cursor:pointer;transition:.15s;box-shadow:0 6px 16px #0003}
+.choice-btn:hover:not(:disabled){border-color:#ffd54a;transform:translateY(-2px)}
+.choice-btn:disabled{cursor:default;opacity:.85}
+.choice-btn.correct{background:#153a22;border-color:#4ade80;color:#4ade80}
+.choice-btn.wrong{background:#3a1620;border-color:#fb7185;color:#fb7185}
+.feedback{min-height:28px;margin-top:12px;font-weight:900}.correct{color:#4ade80}.wrong{color:#fb7185}
+.rewards{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0}.reward{background:#ffffff12;padding:12px 16px;border-radius:15px}
+.leader{display:grid;grid-template-columns:1fr 1fr;gap:12px}.player{padding:16px;border-radius:18px;background:#ffffff0d;border:1px solid #ffffff18}.you{border-color:#ffd54a}
+.bigscore{font-size:42px;font-weight:1000;color:#ffd54a}
+.bracket{display:grid;gap:10px}.match{display:flex;justify-content:space-between;padding:12px 15px;background:#ffffff0b;border-radius:14px}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #ffffff14;text-align:left}th{color:#ffd95c}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#ffd54a22;color:#ffd95c;font-size:12px}
+.toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#111827;color:white;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:10}.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><div class="logo">⚡ 數學閃電王</div><div class="sub">5 題一局・速度＋正確率 PK・一路晉級</div></div>
+    <div class="stats">
+      <div class="pill">🪙 <b id="coins">100</b></div>
+      <div class="pill">🌸 <b id="flowers">0</b></div>
+      <div class="pill">🏆 <b id="wins">0</b> 勝</div>
+    </div>
+  </div>
+
+  <section id="home" class="card hero">
+    <div class="badge">LIVE PK ARENA</div>
+    <h1>你敢挑戰最快手速嗎？</h1>
+    <p>每局 5 題。答得越快、答對越多，獎勵越高。輸掉就淘汰，贏了繼續往冠軍前進！</p>
+    <div class="rewards">
+      <div class="reward">🪙 勝場：+30～80</div>
+      <div class="reward">🌸 完美 5/5：+1 小花</div>
+      <div class="reward">🔥 連勝：額外獎勵</div>
+    </div>
+    <div class="mode">
+      <button class="btn primary" onclick="startGame('easy')">🟢 新手場</button>
+      <button class="btn primary" onclick="startGame('normal')">🟡 菁英場</button>
+      <button class="btn primary" onclick="startGame('hard')">🔴 地獄場</button>
+    </div>
+    <p class="sub">💡 先求正確，再拼速度。每答完一題立即進下一題。</p>
+  </section>
+
+  <section id="game" class="card hidden">
+    <div class="top">
+      <div><span class="round" id="roundLabel">第 1 局</span>　<span id="opponent">VS 數學小霸王</span></div>
+      <div>題目 <b id="qnum">1</b>/5</div>
+    </div>
+    <div class="timer">⏱️ <span id="time">8.0</span>s</div>
+    <div class="bar"><i id="timerbar"></i></div>
+    <div class="question">
+      <div class="qtext" id="question">8 × 7 = ?</div>
+      <div class="choices" id="choices"></div>
+      <div id="feedback" class="feedback"></div>
+    </div>
+  </section>
+
+  <section id="result" class="card hidden hero">
+    <div id="resultIcon" style="font-size:60px">🏆</div>
+    <h1 id="resultTitle">晉級！</h1>
+    <p id="resultText"></p>
+    <div class="rewards">
+      <div class="reward">🪙 +<b id="earnedCoins">0</b></div>
+      <div class="reward">🌸 +<b id="earnedFlowers">0</b></div>
+      <div class="reward">🎯 <b id="score">0</b>/5</div>
+    </div>
+    <button class="btn primary" onclick="nextRound()">⚔️ 繼續挑戰</button>
+    <button class="btn secondary" onclick="showHome()">🏠 回主畫面</button>
+  </section>
+
+  <section id="final" class="card hidden">
+    <div class="hero">
+      <div style="font-size:70px">👑</div>
+      <h1>冠軍誕生！</h1>
+      <p>你已完成本次數學閃電王賽事。</p>
+      <div class="bigscore" id="finalScore">0 分</div>
+    </div>
+    <div class="grid">
+      <div>
+        <h3>🏅 最終晉級名單</h3>
+        <table><thead><tr><th>名次</th><th>選手</th><th>成績</th></tr></thead>
+        <tbody id="ranking"></tbody></table>
+      </div>
+      <div>
+        <h3>⚔️ PK 戰績</h3>
+        <div class="bracket" id="bracket"></div>
+      </div>
+    </div>
+    <div class="hero" style="margin-top:20px">
+      <button class="btn primary" onclick="showHome()">🔁 再來一場</button>
+    </div>
+  </section>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const state={
+ coins:+localStorage.getItem('mathCoins')||100,
+ flowers:+localStorage.getItem('mathFlowers')||0,
+ wins:+localStorage.getItem('mathWins')||0,
+ mode:'normal', round:1, q:0, correct:0, totalTime:0, questions:[], timer:null,
+ history:[], streak:0
+};
+const opponents=[
+ ['小明','🧢'],['算術小霸王','😎'],['閃電喵','🐱'],['計算忍者','🥷'],
+ ['數學王子','🤴'],['腦速女王','👑'],['無影手','⚡'],['終極計算機','🤖']
+];
+function save(){localStorage.setItem('mathCoins',state.coins);localStorage.setItem('mathFlowers',state.flowers);localStorage.setItem('mathWins',state.wins);updateStats()}
+function updateStats(){coins.textContent=state.coins;flowers.textContent=state.flowers;wins.textContent=state.wins}
+function show(id){['home','game','result','final'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id))}
+function showHome(){clearInterval(state.timer);show('home');updateStats()}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1400)}
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function shuffle(arr){
+ const a=arr.slice();
+ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+ return a;
+}
+function makeChoices(ans){
+ const set=new Set([ans]);
+ let guard=0;
+ while(set.size<4 && guard<60){
+   guard++;
+   const range=Math.max(3,Math.round(Math.abs(ans)*0.25)+2);
+   const delta=rand(1,range);
+   const sign=Math.random()<0.5?-1:1;
+   let val=ans+delta*sign;
+   if(val<0) val=ans+delta;
+   if(val<0 || val===ans) continue;
+   set.add(val);
+ }
+ return shuffle([...set]);
+}
+function makeQuestion(mode){
+ let max=mode==='easy'?20:mode==='normal'?50:100;
+ let type=rand(1,4),a,b,op,ans;
+ if(type===1){a=rand(1,max);b=rand(1,max);op='＋';ans=a+b}
+ if(type===2){a=rand(1,max);b=rand(1,a);op='－';ans=a-b}
+ if(type===3){a=rand(2,mode==='hard'?15:12);b=rand(2,mode==='hard'?15:12);op='×';ans=a*b}
+ if(type===4){b=rand(2,mode==='hard'?12:9);ans=rand(2,mode==='hard'?12:10);a=b*ans;op='÷'}
+ return {text:`${a} ${op} ${b} = ?`,ans,choices:makeChoices(ans)}
+}
+function startGame(mode){
+ state.mode=mode;state.round=1;state.history=[];state.streak=0;beginRound();
+}
+function beginRound(){
+ state.q=0;state.correct=0;state.totalTime=0;state.questions=Array.from({length:5},()=>makeQuestion(state.mode));
+ document.getElementById('roundLabel').textContent=`第 ${state.round} 局`;
+ const o=opponents[Math.min(state.round-1,opponents.length-1)];
+ document.getElementById('opponent').textContent=`VS ${o[1]} ${o[0]}`;
+ show('game');nextQuestion();
+}
+function nextQuestion(){
+ if(state.q>=5){endRound();return}
+ const q=state.questions[state.q];
+ question.textContent=q.text;qnum.textContent=state.q+1;feedback.textContent='';feedback.className='feedback';
+ const choicesEl=document.getElementById('choices');
+ choicesEl.innerHTML='';
+ q.choices.forEach(val=>{
+   const b=document.createElement('button');
+   b.className='choice-btn';
+   b.type='button';
+   b.textContent=val;
+   b.dataset.val=val;
+   b.onclick=()=>chooseAnswer(val,b);
+   choicesEl.appendChild(b);
+ });
+ startTimer();
+}
+function startTimer(){
+ clearInterval(state.timer);let t=state.mode==='easy'?10:state.mode==='normal'?8:6;let max=t;time.textContent=t.toFixed(1);timerbar.style.width='100%';
+ state.timer=setInterval(()=>{
+   t-=.1;time.textContent=Math.max(0,t).toFixed(1);timerbar.style.width=Math.max(0,t/max*100)+'%';
+   if(t<=0){
+     clearInterval(state.timer);
+     const q=state.questions[state.q];
+     document.querySelectorAll('.choice-btn').forEach(b=>{b.disabled=true;if(Number(b.dataset.val)===q.ans)b.classList.add('correct')});
+     feedback.textContent='⏰ 超時！';feedback.className='feedback wrong';
+     setTimeout(()=>{state.q++;nextQuestion()},650);
+   }
+ },100);
+}
+function chooseAnswer(val,el){
+ clearInterval(state.timer);
+ const q=state.questions[state.q];
+ document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+ if(val===q.ans){
+   state.correct++;state.streak++;el.classList.add('correct');feedback.textContent='⚡ 正確！';feedback.className='feedback correct';
+ }else{
+   state.streak=0;el.classList.add('wrong');
+   document.querySelectorAll('.choice-btn').forEach(b=>{if(Number(b.dataset.val)===q.ans)b.classList.add('correct')});
+   feedback.textContent=`❌ 答錯，正解 ${q.ans}`;feedback.className='feedback wrong';
+ }
+ state.q++;setTimeout(nextQuestion,650);
+}
+function endRound(){
+ clearInterval(state.timer);
+ let accuracy=state.correct/5;
+ let winChance=accuracy===1?.98:accuracy>=.8?.82:accuracy>=.6?.58:.28;
+ // 模擬對手成績，但保留「速度＋正確率」的感覺
+ let oppCorrect=Math.min(5,Math.max(0,Math.floor(rand(1,5)+(Math.random()<.35?1:0))));
+ let win=accuracy>oppCorrect/5 || (state.correct===oppCorrect && Math.random()<.65);
+ let earned=state.correct*6+(win?30:5)+(state.correct===5?20:0);
+ if(win){state.coins+=earned;state.wins++;if(state.correct===5)state.flowers++;state.streak++}
+ else{state.coins+=5;state.streak=0}
+ save();
+ state.history.push({round:state.round,correct:state.correct,opp:oppCorrect,win});
+ earnedCoins.textContent=win?earned:5;earnedFlowers.textContent=(win&&state.correct===5)?1:0;score.textContent=state.correct;
+ if(win){
+   resultIcon.textContent=state.round>=5?'👑':'🏆';resultTitle.textContent=state.round>=5?'你是數學閃電王！':'晉級！';
+   resultText.textContent=`你 ${state.correct}/5，對手 ${oppCorrect}/5。${state.correct===5?'完美 5/5！小花入手 🌸':''}`;
+ }else{
+   resultIcon.textContent='💥';resultTitle.textContent='淘汰！';
+   resultText.textContent=`你 ${state.correct}/5，對手 ${oppCorrect}/5。別急，下一場可以直接復仇！`;
+ }
+ show('result');
+}
+function nextRound(){
+ if(state.history[state.history.length-1]?.win){
+   if(state.round>=5){finishTournament();return}
+   state.round++;beginRound();
+ }else showHome();
+}
+function finishTournament(){
+ finalScore.textContent=`${state.history.reduce((s,x)=>s+x.correct,0)} 題答對`;
+ ranking.innerHTML='';
+ const names=['你','腦速女王','計算忍者','閃電喵','數學王子','小明'];
+ const rows=names.map((n,i)=>({n,score:i===0?state.history.reduce((s,x)=>s+x.correct,0):rand(10,24)})).sort((a,b)=>b.score-a.score);
+ rows.forEach((r,i)=>ranking.innerHTML+=`<tr><td>${i+1}</td><td>${i===0?'👑 ':''}${r.n}</td><td>${r.score}</td></tr>`);
+ bracket.innerHTML=state.history.map(x=>`<div class="match"><span>第 ${x.round} 局</span><b>${x.win?'✅ 晉級':'❌ 淘汰'} ${x.correct} : ${x.opp}</b></div>`).join('');
+ show('final');
+}
+updateStats();
+</script>
+</body>
+</html>
